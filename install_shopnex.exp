@@ -1,0 +1,27 @@
+#!/usr/bin/expect -f
+
+# Set timeout for waiting for prompts
+set timeout 30
+
+# Start the ShopNex installer
+spawn npx create-shopnex-app . --template simple-shop
+
+# Handle the npm install prompt
+expect {
+    "Ok to proceed?" { send "y\r"; exp_continue }
+    "Select a database" { 
+        # SQLite is already selected by default, just press Enter
+        send "\r"
+    }
+}
+
+# Wait for and handle subsequent prompts
+expect {
+    # Press Enter for all remaining prompts to accept defaults
+    -re ".*" { send "\r"; exp_continue }
+    timeout { exit 0 }
+    eof { exit 0 }
+}
+
+# Wait for installation to complete
+expect eof
